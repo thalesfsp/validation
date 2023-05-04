@@ -7,7 +7,7 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/go-playground/validator/v10"
-	"github.com/saucelabs/customerror"
+	"github.com/thalesfsp/customerror"
 )
 
 // Singleton.
