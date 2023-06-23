@@ -1,6 +1,7 @@
 package validation_test
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -98,5 +99,31 @@ func TestValidation(t *testing.T) {
 				assert.NoError(t, err)
 			}
 		})
+	}
+}
+
+type Test struct {
+	A string `validate:"gte=1"`
+}
+
+func TestValidation_concurrent(t *testing.T) {
+	test := Test{A: "1"}
+
+	for i := 0; i < 100000; i++ {
+		go func() {
+			if err := validation.Validate(&test); err != nil {
+				log.Fatalln(err)
+			}
+		}()
+	}
+}
+
+// Benchmark validation
+func BenchmarkValidation(b *testing.B) {
+	test := Test{A: "1"}
+	for i := 0; i < b.N; i++ {
+		if err := validation.Validate(&test); err != nil {
+			b.Fatal(err)
+		}
 	}
 }

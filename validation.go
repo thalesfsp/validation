@@ -17,6 +17,8 @@ var (
 	// Re-usable, cached validator.
 	// SEE: https://github.com/go-playground/validator/blob/master/_examples/simple/main.go#L27
 	validatorSingleton *validator.Validate
+
+	mu *sync.Mutex
 )
 
 //////
@@ -96,11 +98,16 @@ func dateBefore(fl validator.FieldLevel) bool {
 // `Validate` function instead.
 func Get() *validator.Validate {
 	once.Do(func() {
+		mu = &sync.Mutex{}
+
 		validatorSingleton = validator.New()
 
 		//////
 		// Register custom validators.
 		//////
+
+		mu.Lock()
+		defer mu.Unlock()
 
 		if er := validatorSingleton.RegisterValidation("dateAfter", dateAfter); er != nil {
 			panic("failed to register dateAfter validator")
